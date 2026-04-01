@@ -233,7 +233,94 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] overflow-x-auto shadow-sm dark:shadow-none transition-all duration-500">
+      {/* ── Mobile Card List (hidden on md+) ── */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {paginatedTransactions.length === 0 ? (
+          <div className="py-16 text-center text-sm text-zinc-400 dark:text-zinc-600 bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03]">
+            No transactions found.
+          </div>
+        ) : (
+          paginatedTransactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] p-4 shadow-sm dark:shadow-none flex flex-col gap-3 transition-colors duration-300"
+            >
+              {/* Row 1: Title + Amount */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-200 leading-tight truncate">
+                    {tx.title}
+                  </p>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-0.5 font-mono uppercase tracking-wide">
+                    {tx.id}
+                  </p>
+                </div>
+                <span
+                  className={`font-bold text-[15px] shrink-0 ${
+                    tx.type === "income"
+                      ? "text-green-600 dark:text-emerald-500/80"
+                      : "text-red-500 dark:text-red-500/70"
+                  }`}
+                >
+                  {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Row 2: Date + Status + Actions */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {format(parseISO(tx.date), "dd MMM yyyy")}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className={`px-2.5 py-1 font-medium text-[12px] rounded-full border-transparent shadow-none capitalize ${
+                      tx.status === "pending"
+                        ? "bg-[#FFF4D6] dark:bg-orange-950/20 text-[#D49100] dark:text-orange-500/70"
+                        : tx.status === "completed"
+                        ? "bg-[#DCFCE7] dark:bg-emerald-950/20 text-[#16A34A] dark:text-emerald-500/70"
+                        : "bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {tx.status}
+                  </Badge>
+
+                  {isAdmin && (
+                    <div className="flex items-center gap-1 text-zinc-400 dark:text-zinc-600">
+                      <button
+                        onClick={() => handleEdit(tx)}
+                        className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-zinc-300 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(tx)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
+      </div>
+
+      {/* ── Desktop Table (hidden below md) ── */}
+      <div className="hidden md:block bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] overflow-x-auto shadow-sm dark:shadow-none transition-all duration-500">
         <Table>
           <TableHeader className="bg-gray-50/50 dark:bg-white/[0.01]">
             <TableRow className="border-b border-gray-100 dark:border-white/[0.03] hover:bg-transparent">
@@ -242,32 +329,27 @@ export default function TransactionsPage() {
               </TableHead>
               <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
                 <button onClick={() => handleSort("id")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  ID
-                  {getSortIcon("id")}
+                  ID {getSortIcon("id")}
                 </button>
               </TableHead>
               <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
                 <button onClick={() => handleSort("title")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Title
-                  {getSortIcon("title")}
+                  Title {getSortIcon("title")}
                 </button>
               </TableHead>
               <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
                 <button onClick={() => handleSort("date")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Date
-                  {getSortIcon("date")}
+                  Date {getSortIcon("date")}
                 </button>
               </TableHead>
               <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
                 <button onClick={() => handleSort("amount")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Amount
-                  {getSortIcon("amount")}
+                  Amount {getSortIcon("amount")}
                 </button>
               </TableHead>
               <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
                 <button onClick={() => handleSort("status")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Status
-                  {getSortIcon("status")}
+                  Status {getSortIcon("status")}
                 </button>
               </TableHead>
               {isAdmin && (
@@ -286,22 +368,22 @@ export default function TransactionsPage() {
                 <TableCell className="px-6 py-4">
                   <Checkbox className="rounded-[4px] bg-white dark:bg-zinc-800 border-gray-300 dark:border-white/[0.1] w-5 h-5 flex items-center justify-center data-[state=checked]:bg-black dark:data-[state=checked]:bg-zinc-200 data-[state=checked]:border-black dark:data-[state=checked]:border-zinc-200 shadow-none!" />
                 </TableCell>
-                <TableCell className="py-4 font-medium text-gray-900 dark:text-zinc-300 border-none text-[15px]">
+                <TableCell className="py-4 font-medium text-gray-900 dark:text-zinc-300 border-none text-[14px]">
                   {tx.id.toUpperCase()}
                 </TableCell>
-                <TableCell className="py-4 border-none text-zinc-900 dark:text-zinc-300 w-64 truncate">
-                  <span className="font-medium text-[15px]">{tx.title}</span>
+                <TableCell className="py-4 border-none text-zinc-900 dark:text-zinc-300 max-w-[200px] truncate">
+                  <span className="font-medium text-[14px]">{tx.title}</span>
                 </TableCell>
-                <TableCell className="py-4 font-medium text-gray-600 dark:text-zinc-500 border-none text-[15px]">
+                <TableCell className="py-4 font-medium text-gray-600 dark:text-zinc-500 border-none text-[14px]">
                   {format(parseISO(tx.date), "dd MMM yyyy")}
                 </TableCell>
-                <TableCell className={`py-4 font-semibold border-none text-[15px] ${tx.type === "income" ? "text-green-600 dark:text-emerald-500/70" : "text-red-500 dark:text-red-500/70"}`}>
+                <TableCell className={`py-4 font-semibold border-none text-[14px] ${tx.type === "income" ? "text-green-600 dark:text-emerald-500/70" : "text-red-500 dark:text-red-500/70"}`}>
                   {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
                 </TableCell>
                 <TableCell className="py-4 border-none">
                   <Badge
                     variant="secondary"
-                    className={`px-3.5 py-1.5 font-medium text-[13px] rounded-full border-transparent shadow-none capitalize transition-colors ${
+                    className={`px-3.5 py-1.5 font-medium text-[12px] rounded-full border-transparent shadow-none capitalize transition-colors ${
                       tx.status === "pending"
                         ? "bg-[#FFF4D6] dark:bg-orange-950/20 text-[#D49100] dark:text-orange-500/70"
                         : tx.status === "completed"
@@ -314,20 +396,20 @@ export default function TransactionsPage() {
                 </TableCell>
                 {isAdmin && (
                   <TableCell className="px-6 py-4 text-right border-none">
-                    <div className="flex items-center justify-end gap-3 text-gray-400 dark:text-zinc-600">
+                    <div className="flex items-center justify-end gap-2 text-gray-400 dark:text-zinc-600">
                       <button
                         onClick={() => handleEdit(tx)}
-                        className="hover:text-black dark:hover:text-zinc-300 transition-colors outline-none p-1"
+                        className="hover:text-black dark:hover:text-zinc-300 transition-colors outline-none p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5"
                         title="Edit"
                       >
-                        <Pencil className="w-[18px] h-[18px]" />
+                        <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(tx)}
-                        className="hover:text-red-500 dark:hover:text-red-400 transition-colors outline-none p-1"
+                        className="hover:text-red-500 dark:hover:text-red-400 transition-colors outline-none p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
                         title="Delete"
                       >
-                        <Trash2 className="w-[18px] h-[18px]" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </TableCell>
@@ -336,9 +418,9 @@ export default function TransactionsPage() {
             ))}
           </TableBody>
         </Table>
-        
+
         {totalPages > 1 && (
-          <Pagination 
+          <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
