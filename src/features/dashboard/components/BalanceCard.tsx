@@ -16,8 +16,8 @@ export const BalanceCard = () => {
       </div>
 
       <div className="flex justify-between items-end z-10 w-full mt-auto">
-        <h2 className="text-4xl font-bold tracking-tight">$1,43,899.00</h2>
-        <div className="flex space-x-3">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">$1,43,899.00</h2>
+        <div className="flex flex-wrap gap-2">
           <button className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-semibold flex items-center shadow-lg">
             <ArrowDownLeft className="w-4 h-4 mr-1.5" />
             Deposit

@@ -135,7 +135,7 @@ export const FinancialRecord = () => {
         </Select>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((record, index) => (
           <ScaleCard
             key={index}
@@ -151,7 +151,7 @@ export const FinancialRecord = () => {
             </div>
 
             <div className="flex justify-between items-end w-full relative z-10">
-              <h4 className="text-2xl font-bold text-black dark:text-zinc-200 transition-colors">{record.amount}</h4>
+              <h4 className="text-xl sm:text-2xl font-bold text-black dark:text-zinc-200 transition-colors">{record.amount}</h4>
               <div
                 className={`flex items-center space-x-1 text-xs font-semibold ${record.isPositive ? "text-green-600 dark:text-emerald-500/60" : "text-red-500 dark:text-red-500/60"}`}
               >

@@ -174,13 +174,14 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="flex w-full flex-col space-y-6">
-      <div className="flex items-center justify-between transition-all duration-500">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-200 transition-colors">Transactions</h1>
+    <div className="flex w-full flex-col gap-5">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-200 transition-colors shrink-0">Transactions</h1>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Select defaultValue="all" onValueChange={(v) => { setTimeFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[140px] bg-white dark:bg-[#1a1b21] rounded-full h-10 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
+            <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
             <SelectContent className="dark:bg-[#1f2027] border-white/5">
@@ -193,7 +194,7 @@ export default function TransactionsPage() {
           </Select>
 
           <Select defaultValue="all" onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[140px] bg-white dark:bg-[#1a1b21] rounded-full h-10 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
+            <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent className="dark:bg-[#1f2027] border-white/5">
@@ -204,13 +205,13 @@ export default function TransactionsPage() {
             </SelectContent>
           </Select>
 
-          <div className="relative group">
+          <div className="relative group flex-1 min-w-[160px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-zinc-500 group-focus-within:text-black dark:group-focus-within:text-zinc-200 transition-colors" />
             <Input
               placeholder="Search"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="pl-9 pr-12 w-[240px] rounded-full h-10 bg-white dark:bg-[#1a1b21] border-gray-200 dark:border-white/[0.05] font-medium focus-visible:ring-0 dark:text-zinc-300 placeholder:text-gray-400 dark:placeholder:text-zinc-600 transition-all"
+              className="pl-9 w-full sm:w-[200px] rounded-full h-9 bg-white dark:bg-[#1a1b21] border-gray-200 dark:border-white/[0.05] font-medium focus-visible:ring-0 dark:text-zinc-300 placeholder:text-gray-400 dark:placeholder:text-zinc-600 transition-all"
             />
           </div>
 
@@ -221,9 +222,10 @@ export default function TransactionsPage() {
               isOpen={isFormOpen && selectedTx === null}
               onOpenChange={(open) => { setIsFormOpen(open); if(!open) setSelectedTx(null); }}
               trigger={
-                <Button className="rounded-full h-10 bg-black dark:bg-zinc-200 text-white dark:text-black hover:bg-gray-800 dark:hover:bg-white transition-all px-4 ml-2 shadow-sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Transaction
+                <Button className="rounded-full h-9 bg-black dark:bg-zinc-200 text-white dark:text-black hover:bg-gray-800 dark:hover:bg-white transition-all px-4 shadow-sm text-sm">
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  <span className="hidden sm:inline">New Transaction</span>
+                  <span className="sm:hidden">New</span>
                 </Button>
               }
             />
@@ -231,7 +233,7 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] overflow-hidden shadow-sm dark:shadow-none transition-all duration-500">
+      <div className="bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] overflow-x-auto shadow-sm dark:shadow-none transition-all duration-500">
         <Table>
           <TableHeader className="bg-gray-50/50 dark:bg-white/[0.01]">
             <TableRow className="border-b border-gray-100 dark:border-white/[0.03] hover:bg-transparent">

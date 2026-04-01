@@ -43,7 +43,7 @@ export const TransactionsList = () => {
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-black dark:text-zinc-300 transition-colors truncate w-32">
+                  <h4 className="font-bold text-sm text-black dark:text-zinc-300 transition-colors truncate max-w-[120px] xl:max-w-[160px]">
                     {tx.title}
                   </h4>
                   <p className="text-xs text-text-muted dark:text-zinc-500 mt-0.5">{format(parseISO(tx.date), "dd MMM, yyyy")}</p>
