@@ -39,7 +39,7 @@ export const Pagination = ({
   };
 
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-white/[0.03] bg-white dark:bg-transparent transition-colors">
+    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-white/3 bg-white dark:bg-transparent transition-colors">
       <div className="flex-1 flex justify-between sm:hidden">
         <Button
           variant="outline"

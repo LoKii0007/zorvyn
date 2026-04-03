@@ -7,7 +7,7 @@ export type Transaction = {
   category: string;
   subCategory?: string;
   paymentMethod: "cash" | "card" | "upi" | "bank";
-  status: "completed" | "pending" | "failed";
+  status: "completed" | "pending";
   date: string; // ISO
   createdAt: string;
   updatedAt: string;

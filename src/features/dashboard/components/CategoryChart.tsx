@@ -10,8 +10,10 @@ import {
   Legend,
 } from "recharts";
 import { DUMMY_TRANSACTIONS } from "@/shared/data/transactions";
+import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/shared/store/useThemeStore";
 
-const COLORS = [
+const LIGHT_COLORS = [
   "#000000",
   "#F97316",
   "#22C55E",
@@ -21,7 +23,18 @@ const COLORS = [
   "#EAB308",
 ];
 
-export const CategoryChart = () => {
+const DARK_COLORS = [
+  "#FFFFFF",
+  "#FB923C", // adjusted slightly for dark mode vibrancy if needed, or keep original
+  "#4ADE80",
+  "#60A5FA",
+  "#C084FC",
+  "#F472B6",
+  "#FACC15",
+];
+
+export const CategoryChart = ({ className }: { className?: string }) => {
+  const { theme } = useThemeStore();
   const data = useMemo(() => {
     const categoryTotals: Record<string, number> = {};
 
@@ -39,8 +52,10 @@ export const CategoryChart = () => {
       .sort((a, b) => b.value - a.value);
   }, []);
 
+  const currentColors = theme === "dark" ? DARK_COLORS : LIGHT_COLORS;
+
   return (
-    <div className="flex flex-col space-y-4">
+    <div className={cn("flex flex-col space-y-4", className)}>
       <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-200">
         Category Breakdown
       </h3>
@@ -61,16 +76,17 @@ export const CategoryChart = () => {
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={currentColors[index % currentColors.length]}
+                  opacity={0.8}
                 />
               ))}
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#121217",
+                backgroundColor: theme === "dark" ? "#121217" : "#fafafa",
                 border: "none",
                 borderRadius: "12px",
-                color: "#fff",
+                color: theme === "dark" ? "#fff" : "#000",
                 fontSize: "12px",
               }}
               formatter={(value: any) => `₹${Number(value).toLocaleString()}`}

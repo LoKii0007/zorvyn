@@ -2,105 +2,88 @@
 
 import React, { useState, useMemo } from "react";
 import { useAccountStore } from "@/shared/store/useAccountStore";
+import { useTransactionStore } from "@/shared/store/useTransactionStore";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Search,
-  Pencil,
-  Trash2,
-  Plus,
-  ChevronsUpDown,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
-import { DUMMY_TRANSACTIONS as INITIAL_DATA } from "@/shared/data/transactions";
-import { format, isSameDay, isSameWeek, isSameMonth, isSameYear, parseISO } from "date-fns";
+  parseISO,
+} from "date-fns";
+import { isWithinTimeFilter } from "@/shared/utils/dateUtils";
 import { Pagination } from "@/shared/components/Pagination";
 import { Transaction } from "@/shared/types/transaction";
 import { TransactionFormDialog } from "@/features/transactions/components/TransactionFormDialog";
 import { DeleteConfirmationDialog } from "@/features/transactions/components/DeleteConfirmationDialog";
+import { useDebounce } from "@/shared/hooks/useDebounce";
+import { TransactionsToolbar } from "@/features/transactions/components/TransactionsToolbar";
+import { TransactionsTable } from "@/features/transactions/components/TransactionsTable";
+import { TransactionsMobileList } from "@/features/transactions/components/TransactionsMobileList";
+import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
 type SortConfig = {
-  key: "id" | "title" | "date" | "amount" | "status";
+  key: "id" | "title" | "date" | "amount" | "status" | "category" | "subCategory";
   direction: "asc" | "desc";
 } | null;
 
 export default function TransactionsPage() {
   const { activeAccount } = useAccountStore();
+  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactionStore();
   const isAdmin = activeAccount.role === "admin";
 
-  const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_DATA);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
+  const debouncedSearch = useDebounce(search, 300);
+
   // Modal Control States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
-  const handleSort = (key: "id" | "title" | "date" | "amount" | "status") => {
+  const handleSort = (key: keyof Transaction) => {
     setSortConfig((prev) => {
       if (prev?.key === key) {
-        if (prev.direction === "asc") return { key, direction: "desc" };
+        if (prev.direction === "asc") return { key: key as any, direction: "desc" };
         return null;
       }
-      return { key, direction: "asc" };
+      return { key: key as any, direction: "asc" };
     });
   };
 
   const getSortIcon = (key: string) => {
-    if (sortConfig?.key !== key) return <ChevronsUpDown className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />;
-    return sortConfig.direction === "asc" ? <ChevronUp className="w-3 h-3 text-black dark:text-zinc-200" /> : <ChevronDown className="w-3 h-3 text-black dark:text-zinc-200" />;
+    if (sortConfig?.key !== key)
+      return (
+        <ChevronsUpDown className="w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+      );
+    return sortConfig.direction === "asc" ? (
+      <ChevronUp className="w-3 h-3 text-black dark:text-zinc-200" />
+    ) : (
+      <ChevronDown className="w-3 h-3 text-black dark:text-zinc-200" />
+    );
   };
 
   const filteredTransactions = useMemo(() => {
     let filtered = [...transactions];
 
-    if (search) {
-      filtered = filtered.filter(tx => 
-        tx.title.toLowerCase().includes(search.toLowerCase()) || 
-        tx.id.toLowerCase().includes(search.toLowerCase())
+    if (debouncedSearch) {
+      filtered = filtered.filter(
+        (tx) =>
+          tx.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          tx.id.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
     }
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(tx => tx.status === statusFilter);
+      filtered = filtered.filter((tx) => tx.status === statusFilter);
     }
 
     const now = new Date();
     if (timeFilter !== "all") {
-      filtered = filtered.filter(tx => {
-        const txDate = parseISO(tx.date);
-        switch (timeFilter) {
-          case "daily": return isSameDay(txDate, now);
-          case "weekly": return isSameWeek(txDate, now);
-          case "monthly": return isSameMonth(txDate, now);
-          case "yearly": return isSameYear(txDate, now);
-          default: return true;
-        }
-      });
+      filtered = filtered.filter((tx) =>
+        isWithinTimeFilter(parseISO(tx.date), timeFilter, now),
+      );
     }
 
     if (sortConfig) {
@@ -113,14 +96,17 @@ export default function TransactionsPage() {
           valB = new Date(b.date).getTime();
         }
 
-        if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
-        if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
+        const stringA = String(valA ?? "");
+        const stringB = String(valB ?? "");
+
+        if (stringA < stringB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (stringA > stringB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       });
     }
 
     return filtered;
-  }, [transactions, search, statusFilter, timeFilter, sortConfig]);
+  }, [transactions, debouncedSearch, statusFilter, timeFilter, sortConfig]);
 
   const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
   const paginatedTransactions = useMemo(() => {
@@ -140,16 +126,12 @@ export default function TransactionsPage() {
 
   const handleSave = (data: any) => {
     const amountNum = parseFloat(data.amount);
-    
+
     if (selectedTx) {
-      setTransactions(prev => prev.map(t => 
-        t.id === selectedTx.id ? { 
-          ...t, 
-          ...data, 
-          amount: amountNum, 
-          updatedAt: new Date().toISOString() 
-        } : t
-      ));
+      updateTransaction(selectedTx.id, {
+        ...data,
+        amount: amountNum,
+      });
     } else {
       const newTx: Transaction = {
         id: `tx-${Math.random().toString(36).substr(2, 9)}`,
@@ -162,284 +144,84 @@ export default function TransactionsPage() {
         userId: "user-1",
         paymentMethod: "bank",
       };
-      setTransactions(prev => [newTx, ...prev]);
+      addTransaction(newTx);
     }
   };
 
   const confirmDelete = () => {
     if (selectedTx) {
-      setTransactions(prev => prev.filter(t => t.id !== selectedTx.id));
+      deleteTransaction(selectedTx.id);
       setIsDeleteOpen(false);
     }
   };
 
   return (
     <div className="flex w-full flex-col gap-5">
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-200 transition-colors shrink-0">Transactions</h1>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Select defaultValue="all" onValueChange={(v) => { setTimeFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
-              <SelectValue placeholder="Timeframe" />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-[#1f2027] border-white/5">
-              <SelectItem value="all" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">All Time</SelectItem>
-              <SelectItem value="daily" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Daily</SelectItem>
-              <SelectItem value="weekly" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Weekly</SelectItem>
-              <SelectItem value="monthly" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Monthly</SelectItem>
-              <SelectItem value="yearly" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Yearly</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select defaultValue="all" onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/[0.05] text-sm font-medium focus:ring-0 dark:text-zinc-400">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-[#1f2027] border-white/5">
-              <SelectItem value="all" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">All Status</SelectItem>
-              <SelectItem value="completed" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Completed</SelectItem>
-              <SelectItem value="pending" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Pending</SelectItem>
-              <SelectItem value="failed" className="dark:text-zinc-400 dark:focus:bg-white/[0.03]">Failed</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="relative group flex-1 min-w-[160px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-zinc-500 group-focus-within:text-black dark:group-focus-within:text-zinc-200 transition-colors" />
-            <Input
-              placeholder="Search"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="pl-9 w-full sm:w-[200px] rounded-full h-9 bg-white dark:bg-[#1a1b21] border-gray-200 dark:border-white/[0.05] font-medium focus-visible:ring-0 dark:text-zinc-300 placeholder:text-gray-400 dark:placeholder:text-zinc-600 transition-all"
-            />
-          </div>
-
-          {isAdmin && (
-            <TransactionFormDialog 
-              selectedTx={null} 
-              onSave={handleSave}
-              isOpen={isFormOpen && selectedTx === null}
-              onOpenChange={(open) => { setIsFormOpen(open); if(!open) setSelectedTx(null); }}
-              trigger={
-                <Button className="rounded-full h-9 bg-black dark:bg-zinc-200 text-white dark:text-black hover:bg-gray-800 dark:hover:bg-white transition-all px-4 shadow-sm text-sm">
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  <span className="hidden sm:inline">New Transaction</span>
-                  <span className="sm:hidden">New</span>
-                </Button>
-              }
-            />
-          )}
-        </div>
-      </div>
-
-      {/* ── Mobile Card List (hidden on md+) ── */}
-      <div className="flex flex-col gap-3 md:hidden">
-        {paginatedTransactions.length === 0 ? (
-          <div className="py-16 text-center text-sm text-zinc-400 dark:text-zinc-600 bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03]">
-            No transactions found.
-          </div>
-        ) : (
-          paginatedTransactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] p-4 shadow-sm dark:shadow-none flex flex-col gap-3 transition-colors duration-300"
-            >
-              {/* Row 1: Title + Amount */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[15px] text-zinc-900 dark:text-zinc-200 leading-tight truncate">
-                    {tx.title}
-                  </p>
-                  <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-0.5 font-mono uppercase tracking-wide">
-                    {tx.id}
-                  </p>
-                </div>
-                <span
-                  className={`font-bold text-[15px] shrink-0 ${
-                    tx.type === "income"
-                      ? "text-green-600 dark:text-emerald-500/80"
-                      : "text-red-500 dark:text-red-500/70"
-                  }`}
-                >
-                  {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
-                </span>
-              </div>
-
-              {/* Row 2: Date + Status + Actions */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                  {format(parseISO(tx.date), "dd MMM yyyy")}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className={`px-2.5 py-1 font-medium text-[12px] rounded-full border-transparent shadow-none capitalize ${
-                      tx.status === "pending"
-                        ? "bg-[#FFF4D6] dark:bg-orange-950/20 text-[#D49100] dark:text-orange-500/70"
-                        : tx.status === "completed"
-                        ? "bg-[#DCFCE7] dark:bg-emerald-950/20 text-[#16A34A] dark:text-emerald-500/70"
-                        : "bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    {tx.status}
-                  </Badge>
-
-                  {isAdmin && (
-                    <div className="flex items-center gap-1 text-zinc-400 dark:text-zinc-600">
-                      <button
-                        onClick={() => handleEdit(tx)}
-                        className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-zinc-300 transition-colors"
-                        title="Edit"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(tx)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </div>
-
-      {/* ── Desktop Table (hidden below md) ── */}
-      <div className="hidden md:block bg-white dark:bg-[#1a1b21] rounded-2xl border border-gray-100 dark:border-white/[0.03] overflow-x-auto shadow-sm dark:shadow-none transition-all duration-500">
-        <Table>
-          <TableHeader className="bg-gray-50/50 dark:bg-white/[0.01]">
-            <TableRow className="border-b border-gray-100 dark:border-white/[0.03] hover:bg-transparent">
-              <TableHead className="w-[50px] px-6">
-                <Checkbox className="rounded-[4px] bg-white dark:bg-zinc-800 border-gray-300 dark:border-white/[0.1] w-5 h-5 flex items-center justify-center data-[state=checked]:bg-black dark:data-[state=checked]:bg-zinc-200 data-[state=checked]:border-black dark:data-[state=checked]:border-zinc-200 shadow-none!" />
-              </TableHead>
-              <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
-                <button onClick={() => handleSort("id")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  ID {getSortIcon("id")}
-                </button>
-              </TableHead>
-              <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
-                <button onClick={() => handleSort("title")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Title {getSortIcon("title")}
-                </button>
-              </TableHead>
-              <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
-                <button onClick={() => handleSort("date")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Date {getSortIcon("date")}
-                </button>
-              </TableHead>
-              <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
-                <button onClick={() => handleSort("amount")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Amount {getSortIcon("amount")}
-                </button>
-              </TableHead>
-              <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px]">
-                <button onClick={() => handleSort("status")} className="flex items-center gap-1 group cursor-pointer hover:text-gray-800 dark:hover:text-zinc-300 transition-colors">
-                  Status {getSortIcon("status")}
-                </button>
-              </TableHead>
-              {isAdmin && (
-                <TableHead className="py-4 font-medium text-gray-500 dark:text-zinc-500 text-[13px] px-6 text-right">
-                  Action
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedTransactions.map((tx) => (
-              <TableRow
-                key={tx.id}
-                className="border-b border-gray-50 dark:border-white/[0.02] hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors"
-              >
-                <TableCell className="px-6 py-4">
-                  <Checkbox className="rounded-[4px] bg-white dark:bg-zinc-800 border-gray-300 dark:border-white/[0.1] w-5 h-5 flex items-center justify-center data-[state=checked]:bg-black dark:data-[state=checked]:bg-zinc-200 data-[state=checked]:border-black dark:data-[state=checked]:border-zinc-200 shadow-none!" />
-                </TableCell>
-                <TableCell className="py-4 font-medium text-gray-900 dark:text-zinc-300 border-none text-[14px]">
-                  {tx.id.toUpperCase()}
-                </TableCell>
-                <TableCell className="py-4 border-none text-zinc-900 dark:text-zinc-300 max-w-[200px] truncate">
-                  <span className="font-medium text-[14px]">{tx.title}</span>
-                </TableCell>
-                <TableCell className="py-4 font-medium text-gray-600 dark:text-zinc-500 border-none text-[14px]">
-                  {format(parseISO(tx.date), "dd MMM yyyy")}
-                </TableCell>
-                <TableCell className={`py-4 font-semibold border-none text-[14px] ${tx.type === "income" ? "text-green-600 dark:text-emerald-500/70" : "text-red-500 dark:text-red-500/70"}`}>
-                  {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
-                </TableCell>
-                <TableCell className="py-4 border-none">
-                  <Badge
-                    variant="secondary"
-                    className={`px-3.5 py-1.5 font-medium text-[12px] rounded-full border-transparent shadow-none capitalize transition-colors ${
-                      tx.status === "pending"
-                        ? "bg-[#FFF4D6] dark:bg-orange-950/20 text-[#D49100] dark:text-orange-500/70"
-                        : tx.status === "completed"
-                        ? "bg-[#DCFCE7] dark:bg-emerald-950/20 text-[#16A34A] dark:text-emerald-500/70"
-                        : "bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    {tx.status}
-                  </Badge>
-                </TableCell>
-                {isAdmin && (
-                  <TableCell className="px-6 py-4 text-right border-none">
-                    <div className="flex items-center justify-end gap-2 text-gray-400 dark:text-zinc-600">
-                      <button
-                        onClick={() => handleEdit(tx)}
-                        className="hover:text-black dark:hover:text-zinc-300 transition-colors outline-none p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5"
-                        title="Edit"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(tx)}
-                        className="hover:text-red-500 dark:hover:text-red-400 transition-colors outline-none p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </div>
-
-      <TransactionFormDialog 
-        isOpen={isFormOpen && selectedTx !== null} 
-        onOpenChange={(open) => { setIsFormOpen(open); if(!open) setSelectedTx(null); }} 
-        selectedTx={selectedTx} 
-        onSave={handleSave} 
+      <TransactionsToolbar
+        isAdmin={isAdmin}
+        search={search}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setCurrentPage(1);
+        }}
+        statusFilter={statusFilter}
+        onStatusFilterChange={(v) => {
+          setStatusFilter(v);
+          setCurrentPage(1);
+        }}
+        timeFilter={timeFilter}
+        onTimeFilterChange={(v) => {
+          setTimeFilter(v);
+          setCurrentPage(1);
+        }}
+        onSave={handleSave}
+        isFormOpen={isFormOpen && selectedTx === null}
+        onFormOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setSelectedTx(null);
+        }}
       />
 
-      <DeleteConfirmationDialog 
-        isOpen={isDeleteOpen} 
-        onOpenChange={setIsDeleteOpen} 
-        selectedTx={selectedTx} 
-        onConfirm={confirmDelete} 
+      <TransactionsMobileList
+        transactions={paginatedTransactions}
+        isAdmin={isAdmin}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
+      />
+
+      <TransactionsTable
+        transactions={paginatedTransactions}
+        isAdmin={isAdmin}
+        sortConfig={sortConfig}
+        onSort={handleSort}
+        getSortIcon={getSortIcon}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
+      />
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
+
+      <TransactionFormDialog
+        isOpen={isFormOpen && selectedTx !== null}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setSelectedTx(null);
+        }}
+        selectedTx={selectedTx}
+        onSave={handleSave}
+      />
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        selectedTx={selectedTx}
+        onConfirm={confirmDelete}
       />
     </div>
   );

@@ -31,7 +31,7 @@ export const DeleteConfirmationDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        className={` sm:max-w-[400px] rounded-2xl bg-white !dark:bg-[#191a1e] border-gray-100 dark:border-white/[0.05] shadow-xl overflow-hidden`}
+        className={` sm:max-w-[400px] rounded-2xl bg-white !dark:bg-[#191a1e] border-gray-100 dark:border-white/5 shadow-xl overflow-hidden`}
       >
         <DialogHeader className="p-6">
           <DialogTitle className="text-xl font-bold text-zinc-900 dark:text-zinc-200 transition-colors">
@@ -54,7 +54,7 @@ export const DeleteConfirmationDialog = ({
           </div>
         </div>
 
-        <DialogFooter className="p-6 -mx-6 bg-gray-50/50 dark:bg-white/[0.02] border-t dark:border-white/[0.05]">
+        <DialogFooter className="p-6 -mx-6 bg-gray-50/50 dark:bg-white/2 border-t dark:border-white/5">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
