@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/select";
 import { TransactionFormDialog } from "./TransactionFormDialog";
 
+import { TransactionFormData } from "../types/transaction.types";
+import {
+  TRANSACTION_STATUS_OPTIONS,
+  TRANSACTION_TIMEFRAME_OPTIONS,
+} from "../constants/transactions.constants";
+
 interface TransactionsToolbarProps {
   isAdmin: boolean;
   search: string;
@@ -21,7 +27,7 @@ interface TransactionsToolbarProps {
   onStatusFilterChange: (value: string) => void;
   timeFilter: string;
   onTimeFilterChange: (value: string) => void;
-  onSave: (data: any) => void;
+  onSave: (data: TransactionFormData) => void;
   isFormOpen: boolean;
   onFormOpenChange: (open: boolean) => void;
 }
@@ -39,52 +45,12 @@ export const TransactionsToolbar = ({
   onFormOpenChange,
 }: TransactionsToolbarProps) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
       <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-200 transition-colors shrink-0">
         Transactions
       </h1>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Select value={timeFilter} onValueChange={onTimeFilterChange}>
-          <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/5 text-sm font-medium focus:ring-0 dark:text-zinc-400">
-            <SelectValue placeholder="Timeframe" />
-          </SelectTrigger>
-          <SelectContent className="dark:bg-[#1f2027] border-white/5">
-            <SelectItem value="all" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              All Time
-            </SelectItem>
-            <SelectItem value="daily" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Daily
-            </SelectItem>
-            <SelectItem value="weekly" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Weekly
-            </SelectItem>
-            <SelectItem value="monthly" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Monthly
-            </SelectItem>
-            <SelectItem value="yearly" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Yearly
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-          <SelectTrigger className="w-[120px] bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/5 text-sm font-medium focus:ring-0 dark:text-zinc-400">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent className="dark:bg-[#1f2027] border-white/5">
-            <SelectItem value="all" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              All Status
-            </SelectItem>
-            <SelectItem value="completed" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Completed
-            </SelectItem>
-            <SelectItem value="pending" className="dark:text-zinc-400 dark:focus:bg-white/3">
-              Pending
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="relative group flex-1 min-w-[160px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-zinc-500 group-focus-within:text-black dark:group-focus-within:text-zinc-200 transition-colors" />
           <Input
@@ -95,21 +61,57 @@ export const TransactionsToolbar = ({
           />
         </div>
 
-        {isAdmin && (
-          <TransactionFormDialog
-            selectedTx={null}
-            onSave={onSave}
-            isOpen={isFormOpen}
-            onOpenChange={onFormOpenChange}
-            trigger={
-              <Button className="rounded-full h-9 bg-black dark:bg-zinc-200 text-white dark:text-black hover:bg-gray-800 dark:hover:bg-white transition-all px-4 shadow-sm text-sm">
-                <Plus className="w-4 h-4 mr-1.5" />
-                <span className="hidden sm:inline">New Transaction</span>
-                <span className="sm:hidden">New</span>
-              </Button>
-            }
-          />
-        )}
+        <div className="md:flex grid grid-cols-3 md:flex-wrap items-center gap-2 w-full md:w-auto">
+          <Select value={timeFilter} onValueChange={onTimeFilterChange}>
+            <SelectTrigger className="md:w-[120px] w-full bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/5 text-sm font-medium focus:ring-0 dark:text-zinc-400">
+              <SelectValue placeholder="Timeframe" />
+            </SelectTrigger>
+            <SelectContent className="dark:bg-[#1f2027] border-white/5">
+              {TRANSACTION_TIMEFRAME_OPTIONS.map((opt) => (
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="dark:text-zinc-400 dark:focus:bg-white/3"
+                >
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+            <SelectTrigger className="md:w-[120px] w-full bg-white dark:bg-[#1a1b21] rounded-full h-9 border-gray-200 dark:border-white/5 text-sm font-medium focus:ring-0 dark:text-zinc-400">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="dark:bg-[#1f2027] border-white/5">
+              {TRANSACTION_STATUS_OPTIONS.map((opt) => (
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="dark:text-zinc-400 dark:focus:bg-white/3"
+                >
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {isAdmin && (
+            <TransactionFormDialog
+              selectedTx={null}
+              onSave={onSave}
+              isOpen={isFormOpen}
+              onOpenChange={onFormOpenChange}
+              trigger={
+                <Button className="rounded-full h-9 bg-black dark:bg-zinc-200 text-white dark:text-black hover:bg-gray-800 dark:hover:bg-white transition-all px-4 shadow-sm text-sm w-full md:w-auto">
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  <span className="hidden md:inline">New Transaction</span>
+                  <span className="md:hidden">New</span>
+                </Button>
+              }
+            />
+          )}
+        </div>
       </div>
     </div>
   );

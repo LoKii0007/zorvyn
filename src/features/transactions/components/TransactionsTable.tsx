@@ -19,22 +19,19 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { Transaction } from "@/shared/types/transaction";
-
-type SortConfig = {
-  key: "id" | "title" | "date" | "amount" | "status" | "category" | "subCategory";
-  direction: "asc" | "desc";
-} | null;
+import { Transaction } from "@/shared/types/transaction.types";
+import { SortConfig } from "../types/transaction.types";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
   isAdmin: boolean;
   sortConfig: SortConfig;
-  onSort: (key: any) => void;
+  onSort: (key: keyof Transaction) => void;
   getSortIcon: (key: string) => React.ReactNode;
   onEdit: (tx: Transaction) => void;
   onDelete: (tx: Transaction) => void;
 }
+
 
 export const TransactionsTable = ({
   transactions,

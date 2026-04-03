@@ -1,28 +1,7 @@
 import { create } from 'zustand';
 
-export type Role = 'admin' | 'user';
-
-export interface Account {
-  id: string;
-  name: string;
-  role: Role;
-  email: string;
-}
-
-const DUMMY_ACCOUNTS: Account[] = [
-  {
-    id: '1',
-    name: 'Admin User',
-    role: 'admin',
-    email: 'admin@zorvyn.com',
-  },
-  {
-    id: '2',
-    name: 'Regular User',
-    role: 'user',
-    email: 'user@zorvyn.com',
-  },
-];
+import { Account } from '../types/user.types';
+import { DUMMY_ACCOUNTS } from '../constants/accounts';
 
 interface AccountState {
   accounts: Account[];

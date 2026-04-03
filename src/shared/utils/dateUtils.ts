@@ -9,12 +9,8 @@ import {
   subYears,
 } from "date-fns";
 
-export type TimeFilter = "daily" | "weekly" | "monthly" | "yearly" | "all" | "custom" | string;
-
-export interface DateRange {
-  from: Date | undefined;
-  to?: Date | undefined;
-}
+import { TimeFilter, DateRange } from "../types/date.types";
+export type { TimeFilter, DateRange };
 
 /**
  * Checks if a given date matches a specific time filter relative to a reference date.

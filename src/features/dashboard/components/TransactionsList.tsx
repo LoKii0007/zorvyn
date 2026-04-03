@@ -14,9 +14,12 @@ import Link from "next/link";
 import { useTransactionStore } from "@/shared/store/useTransactionStore";
 import { useAccountStore } from "@/shared/store/useAccountStore";
 import { TransactionFormDialog } from "@/features/transactions/components/TransactionFormDialog";
-import { Transaction } from "@/shared/types/transaction";
+import { Transaction } from "@/shared/types/transaction.types";
 import { Button } from "@/components/ui/button";
-import { getTransactionIcon, getTransactionTypeStyles } from "../helpers/dashboardHelpers";
+import {
+  getTransactionIcon,
+  getTransactionTypeStyles,
+} from "../utils/dashboardHelpers";
 
 export const TransactionsList = () => {
   const { transactions, addTransaction } = useTransactionStore();
@@ -59,9 +62,10 @@ export const TransactionsList = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 rounded-full hover:bg-black/5 dark:hover:bg-white/5"
+                className="rounded-full flex gap-2 items-center bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10"
               >
                 <Plus className="w-4 h-4 text-zinc-500" />
+                New
               </Button>
             }
           />

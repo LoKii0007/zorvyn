@@ -4,7 +4,7 @@ import React from "react";
 import { format, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
-import { Transaction } from "@/shared/types/transaction";
+import { Transaction } from "@/shared/types/transaction.types";
 
 interface TransactionsMobileListProps {
   transactions: Transaction[];
@@ -12,6 +12,7 @@ interface TransactionsMobileListProps {
   onEdit: (tx: Transaction) => void;
   onDelete: (tx: Transaction) => void;
 }
+
 
 export const TransactionsMobileList = ({
   transactions,

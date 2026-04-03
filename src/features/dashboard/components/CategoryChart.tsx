@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { DUMMY_TRANSACTIONS } from "@/shared/data/transactions";
+import { DUMMY_TRANSACTIONS } from "@/shared/constants/transactions";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/shared/store/useThemeStore";
 

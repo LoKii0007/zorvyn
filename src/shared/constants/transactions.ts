@@ -1,4 +1,4 @@
-import { Transaction } from "../types/transaction";
+import { Transaction } from "../types/transaction.types";
 import { CATEGORIES } from "./categories";
 
 // Simple seeded random function to ensure consistent results between server and client

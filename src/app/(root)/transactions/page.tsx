@@ -3,12 +3,10 @@
 import React, { useState, useMemo } from "react";
 import { useAccountStore } from "@/shared/store/useAccountStore";
 import { useTransactionStore } from "@/shared/store/useTransactionStore";
-import {
-  parseISO,
-} from "date-fns";
+import { parseISO } from "date-fns";
 import { isWithinTimeFilter } from "@/shared/utils/dateUtils";
 import { Pagination } from "@/shared/components/Pagination";
-import { Transaction } from "@/shared/types/transaction";
+import { Transaction } from "@/shared/types/transaction.types";
 import { TransactionFormDialog } from "@/features/transactions/components/TransactionFormDialog";
 import { DeleteConfirmationDialog } from "@/features/transactions/components/DeleteConfirmationDialog";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -18,15 +16,16 @@ import { TransactionsMobileList } from "@/features/transactions/components/Trans
 import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
+import {
+  SortConfig,
+  TransactionFormData,
+} from "@/features/transactions/types/transaction.types";
 
-type SortConfig = {
-  key: "id" | "title" | "date" | "amount" | "status" | "category" | "subCategory";
-  direction: "asc" | "desc";
-} | null;
 
 export default function TransactionsPage() {
   const { activeAccount } = useAccountStore();
-  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactionStore();
+  const { transactions, addTransaction, updateTransaction, deleteTransaction } =
+    useTransactionStore();
   const isAdmin = activeAccount.role === "admin";
 
   const [search, setSearch] = useState("");
@@ -45,7 +44,8 @@ export default function TransactionsPage() {
   const handleSort = (key: keyof Transaction) => {
     setSortConfig((prev) => {
       if (prev?.key === key) {
-        if (prev.direction === "asc") return { key: key as any, direction: "desc" };
+        if (prev.direction === "asc")
+          return { key: key as any, direction: "desc" };
         return null;
       }
       return { key: key as any, direction: "asc" };
@@ -156,27 +156,27 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="flex w-full flex-col gap-5">
+    <div className="flex w-full flex-col gap-5 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <TransactionsToolbar
         isAdmin={isAdmin}
         search={search}
-        onSearchChange={(v) => {
+        onSearchChange={(v: string) => {
           setSearch(v);
           setCurrentPage(1);
         }}
         statusFilter={statusFilter}
-        onStatusFilterChange={(v) => {
+        onStatusFilterChange={(v: string) => {
           setStatusFilter(v);
           setCurrentPage(1);
         }}
         timeFilter={timeFilter}
-        onTimeFilterChange={(v) => {
+        onTimeFilterChange={(v: string) => {
           setTimeFilter(v);
           setCurrentPage(1);
         }}
         onSave={handleSave}
         isFormOpen={isFormOpen && selectedTx === null}
-        onFormOpenChange={(open) => {
+        onFormOpenChange={(open: boolean) => {
           setIsFormOpen(open);
           if (!open) setSelectedTx(null);
         }}
@@ -204,6 +204,7 @@ export default function TransactionsPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          className="py-0"
         />
       )}
 

@@ -1,5 +1,5 @@
 import { Coffee, Plane, MonitorSmartphone } from "lucide-react";
-import { Transaction } from "@/shared/types/transaction";
+import { Transaction } from "@/shared/types/transaction.types";
 import {
   format,
   parseISO,
@@ -16,7 +16,7 @@ import {
   isSameMonth,
   differenceInDays,
 } from "date-fns";
-import { DateRange } from "@/shared/utils/dateUtils";
+import { DateRange } from "@/shared/types/date.types";
 
 /**
  * Groups transactions for the MoneyFlowChart based on absolute interval and explicit grouping.

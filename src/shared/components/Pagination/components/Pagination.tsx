@@ -3,17 +3,20 @@
 import React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  className?: string;
 }
 
 export const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
+  className,
 }: PaginationProps) => {
   const getPageNumbers = () => {
     const pages = [];
@@ -39,7 +42,12 @@ export const Pagination = ({
   };
 
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-white/3 bg-white dark:bg-transparent transition-colors">
+    <div
+      className={cn(
+        "flex items-center justify-between px-6 py-4 border-gray-100 dark:border-white/3 bg-transparent transition-colors",
+        className,
+      )}
+    >
       <div className="flex-1 flex justify-between sm:hidden">
         <Button
           variant="outline"

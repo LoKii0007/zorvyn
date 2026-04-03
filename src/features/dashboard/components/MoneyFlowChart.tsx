@@ -10,10 +10,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { DUMMY_TRANSACTIONS, REFERENCE_NOW } from "@/shared/data/transactions";
+import { DUMMY_TRANSACTIONS, REFERENCE_NOW } from "@/shared/constants/transactions";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/shared/store/useThemeStore";
-import { getMoneyFlowData } from "../helpers/dashboardHelpers";
+import { getMoneyFlowData } from "../utils/dashboardHelpers";
 import { subDays } from "date-fns";
 import { MoneyFlowChartFilterDialog } from "./MoneyFlowChartFilterDialog";
 

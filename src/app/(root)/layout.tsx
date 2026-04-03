@@ -18,11 +18,11 @@ export default function RootLayout({
     <div className={`${mounted ? resolvedTheme : "light"} w-full`}>
       <div className="flex h-screen w-full bg-[#f7f8fa] dark:bg-[#14151a] overflow-hidden font-sans transition-colors duration-500">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto flex flex-col min-w-0">
-          <div className="sticky top-0 z-10 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 bg-[#f7f8fa]/80 dark:bg-[#14151a]/80 backdrop-blur-md border-b border-black/4 dark:border-white/3">
+        <main className="flex-1 overflow-hidden flex flex-col min-w-0">
+          <div className="sticky top-0 z-50 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 bg-[#f7f8fa]/80 dark:bg-[#14151a]/80 backdrop-blur-md border-b border-black/4 dark:border-white/3">
             <Header />
           </div>
-          <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 text-zinc-900 dark:text-zinc-300">
+          <div className="flex-1 overflow-hidden text-zinc-900 dark:text-zinc-300 flex flex-col">
             {children}
           </div>
         </main>

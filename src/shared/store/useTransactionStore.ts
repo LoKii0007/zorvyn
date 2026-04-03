@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { Transaction } from "@/shared/types/transaction";
-import { DUMMY_TRANSACTIONS } from "@/shared/data/transactions";
+import { Transaction } from "@/shared/types/transaction.types";
+import { DUMMY_TRANSACTIONS } from "@/shared/constants/transactions";
 
 interface TransactionState {
   transactions: Transaction[];

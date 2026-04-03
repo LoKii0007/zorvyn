@@ -7,7 +7,7 @@ import {
   subYears,
   startOfWeek,
 } from "date-fns";
-import { REFERENCE_NOW } from "@/shared/data/transactions";
+import { REFERENCE_NOW } from "@/shared/constants/transactions";
 import { Filter, CalendarIcon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,9 +19,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DateRangePicker } from "./DateRangePicker";
-import { DateRange } from "@/shared/utils/dateUtils";
+import { DateRange } from "@/shared/types/date.types";
 
-type GroupingType = "daily" | "weekly" | "monthly" | "yearly";
+import { GroupingType } from "../types/dashboard.types";
+import { useSyncFilterState } from "../hooks/useSyncFilterState";
 
 interface Props {
   appliedInterval: { from: Date; to: Date };
@@ -37,18 +38,11 @@ export const MoneyFlowChartFilterDialog = ({
   onReset,
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [interval, setInterval] = useState<{ from: Date; to?: Date }>(
+  const { interval, setInterval, grouping, setGrouping } = useSyncFilterState(
+    isOpen,
     appliedInterval,
+    appliedGrouping,
   );
-  const [grouping, setGrouping] = useState<GroupingType>(appliedGrouping);
-
-  // Sync state when opened
-  React.useEffect(() => {
-    if (isOpen) {
-      setInterval(appliedInterval);
-      setGrouping(appliedGrouping);
-    }
-  }, [isOpen, appliedInterval, appliedGrouping]);
 
   const presetIntervals = [
     {
@@ -107,7 +101,7 @@ export const MoneyFlowChartFilterDialog = ({
           className={`h-8 w-8 p-0 rounded-full transition-colors ${
             isFilterActive
               ? "bg-black border-black dark:bg-white dark:border-white hover:bg-black/80 dark:hover:bg-white/80"
-              : "bg-white dark:bg-[#1a1b21] border-black/10 dark:border-white/5 hover:bg-black/80 dark:hover:bg-white/80"
+              : "bg-white dark:bg-[#1a1b21] border-black/10 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5"
           }`}
         >
           <Filter
@@ -138,7 +132,7 @@ export const MoneyFlowChartFilterDialog = ({
                   onClick={() => setInterval(preset.value)}
                   className={`dark:border-white/10 ${
                     interval.from.getTime() === preset.value.from.getTime()
-                      ? "bg-black text-white dark:bg-white dark:text-black"
+                      ? "bg-black text-white dark:bg-white dark:text-black hover:bg-black/80 hover:text-white dark:hover:bg-white/80 dark:hover:text-black"
                       : "bg-transparent dark:text-zinc-300"
                   }`}
                 >

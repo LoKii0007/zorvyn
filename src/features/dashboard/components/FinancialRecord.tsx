@@ -3,7 +3,10 @@
 import React, { useMemo, useState } from "react";
 import { ArrowUpRight, MoreVertical } from "lucide-react";
 import { ScaleCard } from "../../../components/ui/ScaleCard";
-import { DUMMY_TRANSACTIONS, REFERENCE_NOW } from "@/shared/data/transactions";
+import {
+  DUMMY_TRANSACTIONS,
+  REFERENCE_NOW,
+} from "@/shared/constants/transactions";
 import { parseISO } from "date-fns";
 import {
   Select,
@@ -14,12 +17,12 @@ import {
 } from "@/components/ui/select";
 import { DateRangePicker } from "./DateRangePicker";
 import {
-  DateRange,
   isWithinTimeFilter,
   getPreviousPeriodDate,
 } from "@/shared/utils/dateUtils";
+import { DateRange } from "@/shared/types/date.types";
 import { subDays } from "date-fns";
-import { calculateTotals, calculatePercent } from "../helpers/dashboardHelpers";
+import { calculateTotals, calculatePercent } from "../utils/dashboardHelpers";
 import { AnimatePresence, motion } from "motion/react";
 
 export const FinancialRecord = () => {
@@ -132,9 +135,9 @@ export const FinancialRecord = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((record, index) => (
-          <ScaleCard
+          <div
             key={index}
-            className={`${record.color} border-0! flex flex-col justify-between h-36 relative overflow-hidden transition-colors duration-500 shadow-sm dark:shadow-none`}
+            className={`${record.color} border-0! bg-card rounded-2xl p-6 hover:scale-102 transition-all duration-200 ease-in-out border-black/5 flex flex-col justify-between h-36 relative overflow-hidden shadow-sm dark:shadow-none`}
           >
             <div className="flex justify-between items-start w-full relative z-10">
               <span className="text-sm font-medium opacity-80 dark:opacity-50">
@@ -180,7 +183,7 @@ export const FinancialRecord = () => {
                 strokeLinecap="round"
               />
             </svg>
-          </ScaleCard>
+          </div>
         ))}
       </div>
     </div>
