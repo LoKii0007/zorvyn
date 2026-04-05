@@ -113,7 +113,7 @@ export const MoneyFlowChartFilterDialog = ({
           />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] dark:bg-[#1f2027] dark:border-white/10 dark:text-zinc-200">
+      <DialogContent className="dark:bg-[#1f2027] dark:border-white/10 dark:text-zinc-200">
         <DialogHeader>
           <DialogTitle>Chart Filters</DialogTitle>
         </DialogHeader>
@@ -181,7 +181,7 @@ export const MoneyFlowChartFilterDialog = ({
           </div>
         </div>
 
-        <DialogFooter className="flex justify-between items-center sm:justify-between w-full">
+        <DialogFooter className="grid grid-cols-2 sm:flex justify-between items-center w-[calc(100%+2rem)] -mx-4">
           <Button
             variant="ghost"
             onClick={handleReset}

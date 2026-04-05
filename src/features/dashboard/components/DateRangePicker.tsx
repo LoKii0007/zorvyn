@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover } from "@/components/ui/popover";
 import { DateRange } from "@/shared/utils/dateUtils";
+import useWindow from "@/shared/hooks/useWindow";
 
 interface DateRangePickerProps {
   className?: string;
@@ -20,17 +21,18 @@ export function DateRangePicker({
   date,
   setDate,
 }: DateRangePickerProps) {
+  const { isMobile } = useWindow();
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover
-        align="start"
+        align={isMobile ? "end" : "start"}
         trigger={
           <Button
             id="date"
             variant={"outline"}
             className={cn(
               "w-[240px] justify-start text-left font-normal h-8 rounded-full bg-white dark:bg-[#1a1b21] border-black/10 dark:border-white/5",
-              !date && "text-zinc-500"
+              !date && "text-zinc-500",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -49,11 +51,7 @@ export function DateRangePicker({
           </Button>
         }
       >
-        <Calendar
-          mode="range"
-          selected={date}
-          onSelect={setDate}
-        />
+        <Calendar mode="range" selected={date} onSelect={setDate} />
       </Popover>
     </div>
   );

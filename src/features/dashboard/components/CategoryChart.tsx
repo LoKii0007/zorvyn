@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import {
   PieChart,
   Pie,
@@ -9,9 +9,10 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { DUMMY_TRANSACTIONS } from "@/shared/constants/transactions";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/shared/store/useThemeStore";
+import { useCategoryBreakdown } from "../hooks/useCategoryBreakdown";
+import useWindow from "@/shared/hooks/useWindow";
 
 const LIGHT_COLORS = [
   "#000000",
@@ -25,7 +26,7 @@ const LIGHT_COLORS = [
 
 const DARK_COLORS = [
   "#FFFFFF",
-  "#FB923C", // adjusted slightly for dark mode vibrancy if needed, or keep original
+  "#FB923C",
   "#4ADE80",
   "#60A5FA",
   "#C084FC",
@@ -35,22 +36,8 @@ const DARK_COLORS = [
 
 export const CategoryChart = ({ className }: { className?: string }) => {
   const { theme } = useThemeStore();
-  const data = useMemo(() => {
-    const categoryTotals: Record<string, number> = {};
-
-    // Only count expenses for category breakdown
-    DUMMY_TRANSACTIONS.filter((tx) => tx.type === "expense").forEach((tx) => {
-      categoryTotals[tx.category] =
-        (categoryTotals[tx.category] || 0) + tx.amount;
-    });
-
-    return Object.entries(categoryTotals)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }))
-      .sort((a, b) => b.value - a.value);
-  }, []);
+  const { isMobile } = useWindow();
+  const data = useCategoryBreakdown();
 
   const currentColors = theme === "dark" ? DARK_COLORS : LIGHT_COLORS;
 
@@ -59,7 +46,7 @@ export const CategoryChart = ({ className }: { className?: string }) => {
       <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-200">
         Category Breakdown
       </h3>
-      <div className="h-64 w-full bg-white dark:bg-[#1a1b21] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-sm dark:shadow-none transition-all duration-500">
+      <div className="h-82 md:h-64 w-full bg-white dark:bg-[#1a1b21] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-sm dark:shadow-none transition-all duration-500">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -92,9 +79,9 @@ export const CategoryChart = ({ className }: { className?: string }) => {
               formatter={(value: any) => `₹${Number(value).toLocaleString()}`}
             />
             <Legend
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
+              verticalAlign={isMobile ? "bottom" : "middle"}
+              align={isMobile ? "center" : "left"}
+              layout={isMobile ? "horizontal" : "vertical"}
               iconType="circle"
               wrapperStyle={{
                 paddingLeft: "20px",

@@ -40,7 +40,7 @@ export default function DashboardPage() {
         <CategoryChart />
       </div>
 
-      {/* Right Column (Animated) */}
+      {/* Right Column*/}
       <AnimatePresence initial={false}>
         {showTransactions && (
           <motion.div

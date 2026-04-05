@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   LogOut,
   Code,
@@ -25,12 +25,10 @@ import { useAccountStore } from "@/shared/store/useAccountStore";
 import { useSidebarStore } from "@/shared/store/useSidebarStore";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 
-
-
 export const Sidebar = () => {
   const pathname = usePathname();
   const { accounts, activeAccount, setActiveAccount } = useAccountStore();
-  const { isOpen, close, isMini, toggleMini } = useSidebarStore();
+  const { isOpen, isMini, toggleMini, close } = useSidebarStore();
   const debouncedIsMini = useDebounce(isMini, 200);
 
   return (
@@ -96,9 +94,7 @@ export const Sidebar = () => {
                 href={item.href}
                 onClick={close}
                 className={`w-full flex group items-center transition-all duration-300 justify-start ${
-                  isMini 
-                    ? "px-[19px] gap-0 py-3" 
-                    : "px-3 gap-3 py-2.5"
+                  isMini ? "px-[19px] gap-0 py-3" : "px-3 gap-3 py-2.5"
                 } rounded-xl text-[14px] font-medium ${
                   isActive
                     ? "text-black dark:text-zinc-100 bg-black/5 dark:bg-white/5"
@@ -192,7 +188,9 @@ export const Sidebar = () => {
               isMini ? "px-[19px]" : "px-3 justify-between"
             } py-2.5 text-sm text-zinc-500 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/2 rounded-xl`}
           >
-            {!isMini && <span className="font-medium flex-1 text-left">Sign out</span>}
+            {!isMini && (
+              <span className="font-medium flex-1 text-left">Sign out</span>
+            )}
             <LogOut className="w-4 h-4 shrink-0" />
           </button>
         </div>

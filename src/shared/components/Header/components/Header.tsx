@@ -3,14 +3,12 @@
 import React from "react";
 import { Bell, Settings, Menu, SunIcon, MoonIcon } from "lucide-react";
 import { useThemeStore } from "@/shared/store/useThemeStore";
-import { useMounted } from "@/shared/hooks/useMounted";
 import { useSidebarStore } from "@/shared/store/useSidebarStore";
 
 import { GREETING_DEFAULT } from "@/shared/constants/navigation";
 
 export const Header = () => {
   const { toggleTheme, resolvedTheme } = useThemeStore();
-  const mounted = useMounted();
   const { toggle } = useSidebarStore();
 
   return (
@@ -29,13 +27,6 @@ export const Header = () => {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white transition-colors leading-none">
             {GREETING_DEFAULT}
           </h1>
-          <span
-            className="text-xl sm:text-2xl lg:text-3xl"
-            role="img"
-            aria-label="wave"
-          >
-            👋
-          </span>
         </div>
       </div>
 
@@ -47,14 +38,11 @@ export const Header = () => {
           <button
             onClick={toggleTheme}
             className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-zinc-200 dark:bg-zinc-700 transition-colors focus:outline-none"
-            title={`Switch to ${resolvedTheme === "light" ? "dark" : "light"} mode`}
             aria-label="Toggle theme"
           >
             <span
               className={`${
-                mounted && resolvedTheme === "dark"
-                  ? "translate-x-6"
-                  : "translate-x-1"
+                resolvedTheme === "dark" ? "translate-x-6" : "translate-x-1"
               } inline-block h-4 w-4 transform rounded-full bg-white dark:bg-zinc-200 transition-transform shadow-sm`}
             />
           </button>

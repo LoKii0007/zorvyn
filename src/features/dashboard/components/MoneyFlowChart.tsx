@@ -10,7 +10,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { DUMMY_TRANSACTIONS, REFERENCE_NOW } from "@/shared/constants/transactions";
+import {
+  DUMMY_TRANSACTIONS,
+  REFERENCE_NOW,
+} from "@/shared/constants/transactions";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/shared/store/useThemeStore";
 import { getMoneyFlowData } from "../utils/dashboardHelpers";
@@ -57,7 +60,7 @@ export const MoneyFlowChart = ({ className }: { className?: string }) => {
       <div className="flex justify-between items-center">
         <h3 className="font-bold text-lg">Money Flow</h3>
 
-        <div className="flex items-center space-x-6 text-sm">
+        <div className="sm:flex hidden items-center space-x-6 text-sm">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-black dark:bg-[#fafafa]"></span>
             <span className="text-gray-600 font-medium dark:text-zinc-200">
@@ -88,6 +91,21 @@ export const MoneyFlowChart = ({ className }: { className?: string }) => {
               setAppliedGrouping("weekly");
             }}
           />
+        </div>
+      </div>
+
+      <div className="sm:hidden flex items-center space-x-6 text-sm">
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-black dark:bg-[#fafafa]"></span>
+          <span className="text-gray-600 font-medium dark:text-zinc-200">
+            Total Saving
+          </span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+          <span className="text-gray-600 font-medium dark:text-zinc-200">
+            Total Expense
+          </span>
         </div>
       </div>
 

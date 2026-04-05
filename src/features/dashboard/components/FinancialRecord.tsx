@@ -81,11 +81,11 @@ export const FinancialRecord = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col gap-2 md:flex-row justify-between md:items-center mb-4">
         <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-200 transition-colors">
           Financial Record
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-row-reverse md:flex-row items-center justify-between md:justify-end gap-2">
           <DateRangePicker
             date={dateRange}
             setDate={(range) => {
