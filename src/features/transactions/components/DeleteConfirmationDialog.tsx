@@ -68,7 +68,7 @@ export const DeleteConfirmationDialog = ({
             variant="destructive"
             className="rounded-xl px-8 bg-red-700 dark:bg-red-500/60 text-white hover:bg-red-600 dark:hover:bg-red-600/60 transition-all h-11 font-semibold shadow-sm"
           >
-            Delete Permanently
+            Delete 
           </Button>
         </DialogFooter>
       </DialogContent>
